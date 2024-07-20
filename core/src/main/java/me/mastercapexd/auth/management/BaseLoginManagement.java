@@ -12,6 +12,7 @@ import com.bivashy.auth.api.database.AccountDatabase;
 import com.bivashy.auth.api.event.AccountJoinEvent;
 import com.bivashy.auth.api.event.AccountSessionEnterEvent;
 import com.bivashy.auth.api.factory.AuthenticationStepFactory;
+import com.bivashy.auth.api.link.user.LinkUser;
 import com.bivashy.auth.api.management.LoginManagement;
 import com.bivashy.auth.api.server.ServerCore;
 import com.bivashy.auth.api.server.player.ServerPlayer;
@@ -19,6 +20,7 @@ import com.bivashy.auth.api.step.AuthenticationStepContext;
 
 import io.github.revxrsal.eventbus.PostResult;
 import me.mastercapexd.auth.config.message.server.ServerMessageContext;
+import me.mastercapexd.auth.link.telegram.TelegramLinkType;
 import me.mastercapexd.auth.step.impl.NullAuthenticationStep.NullAuthenticationStepFactory;
 
 public class BaseLoginManagement implements LoginManagement {
@@ -75,10 +77,13 @@ public class BaseLoginManagement implements LoginManagement {
             AuthenticationStepContext context = plugin.getAuthenticationContextFactoryBucket()
                     .createContext(authenticationStepCreator.getAuthenticationStepName(), account);
 
+            //Telegram check
+            LinkUser linkUser = account.findFirstLinkUser(user -> user.getLinkType().equals(TelegramLinkType.getInstance())).orElse(null);
+
             return plugin.getEventBus().publish(AccountJoinEvent.class, account, false).thenApplyAsync(event -> {
                 if (event.getEvent().isCancelled())
                     return account;
-                if (account.isSessionActive(config.getSessionDurability()) && account.getLastIpAddress().equals(player.getPlayerIp())) {
+                if (account.isSessionActive(config.getSessionDurability()) && account.getLastIpAddress().equals(player.getPlayerIp()) && linkUser != null && !linkUser.isIdentifierDefaultOrNull()) {
                     PostResult<AccountSessionEnterEvent> sessionEnterEventPostResult = plugin.getEventBus()
                             .publish(AccountSessionEnterEvent.class, account, false)
                             .join();

@@ -23,12 +23,12 @@ public class RegisterAuthenticationStep extends AuthenticationStepTemplate imple
     @Override
     public boolean shouldPassToNextStep() {
         boolean isCurrentAccountRegistered = authenticationStepContext.getAccount().isRegistered();
-        if (isCurrentAccountRegistered) {
-            Account account = authenticationStepContext.getAccount();
-            PLUGIN.getAuthenticatingAccountBucket().removeAuthenticatingAccount(account);
-            account.setLastSessionStartTimestamp(System.currentTimeMillis());
-            account.getPlayer().map(ServerPlayer::getPlayerIp).ifPresent(account::setLastIpAddress);
-        }
+//        if (isCurrentAccountRegistered) {
+//            Account account = authenticationStepContext.getAccount();
+//            PLUGIN.getAuthenticatingAccountBucket().removeAuthenticatingAccount(account);
+//            account.setLastSessionStartTimestamp(System.currentTimeMillis());
+//            account.getPlayer().map(ServerPlayer::getPlayerIp).ifPresent(account::setLastIpAddress);
+//        }
         return isCurrentAccountRegistered;
     }
 

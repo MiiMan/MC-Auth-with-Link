@@ -53,22 +53,25 @@ public class MessengerAuthenticationStep extends AuthenticationStepTemplate impl
 
         if (linkUser == null) {
             linkEntryUser.getAccount().getPlayer().ifPresent(player -> player.sendMessage(linkType.getServerMessages().getMessage("not-linked")));
-            return true;
+            return false;
         }
 
         LinkUserInfo linkUserInfo = linkUser.getLinkUserInfo();
 
         if (linkUser.isIdentifierDefaultOrNull()) {
             linkEntryUser.getAccount().getPlayer().ifPresent(player -> player.sendMessage(linkType.getServerMessages().getMessage("not-linked")));
-            return true;
+            return false;
         }
 
-        if (linkType.getSettings().getConfirmationSettings().canToggleConfirmation() && !linkUserInfo.isConfirmationEnabled())
-            return true;
+//        if (linkType.getSettings().getConfirmationSettings().canToggleConfirmation() && !linkUserInfo.isConfirmationEnabled())
+//            return true;
 
         PLUGIN.getLinkEntryBucket().modifiable().add(linkEntryUser);
 
-        sendConfirmationMessage(account, linkType, linkUserInfo);
+        if (linkUser != null && !linkUser.isIdentifierDefaultOrNull()) {
+            sendConfirmationMessage(account, linkType, linkUserInfo);
+        }
+
         return false;
     }
 

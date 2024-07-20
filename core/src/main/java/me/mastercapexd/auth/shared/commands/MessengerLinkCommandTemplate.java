@@ -45,7 +45,7 @@ public class MessengerLinkCommandTemplate implements OrphanCommand {
 
     public void sendLinkConfirmation(MessageableCommandActor commandActor, LinkConfirmationUser confirmationUser) {
         plugin.getLinkConfirmationBucket().modifiable().add(confirmationUser);
-        commandActor.replyWithMessage(messages.getMessage("confirmation-sent", MessageContext.of("%code%", confirmationUser.getConfirmationCode())));
+//        commandActor.replyWithMessage(messages.getMessage("confirmation-sent", MessageContext.of("%code%", confirmationUser.getConfirmationCode())));
     }
 
     public String generateCode(Supplier<String> codeGenerator) {

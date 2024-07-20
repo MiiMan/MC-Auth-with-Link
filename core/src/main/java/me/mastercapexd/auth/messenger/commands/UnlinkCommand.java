@@ -1,6 +1,8 @@
 package me.mastercapexd.auth.messenger.commands;
 
+import com.bivashy.auth.api.AuthPlugin;
 import com.bivashy.auth.api.account.Account;
+import com.bivashy.auth.api.config.PluginConfig;
 import com.bivashy.auth.api.database.AccountDatabase;
 import com.bivashy.auth.api.event.AccountUnlinkEvent;
 import com.bivashy.auth.api.link.LinkType;
@@ -22,6 +24,12 @@ public class UnlinkCommand implements OrphanCommand {
     @Dependency
     private EventBus eventBus;
 
+    @Dependency
+    private PluginConfig config;
+
+    @Dependency
+    private AuthPlugin plugin;
+
     @ConfigurationArgumentError("unlink-not-enough-arguments")
     @DefaultFor("~")
     public void onUnlink(LinkCommandActorWrapper actorWrapper, LinkType linkType, Account account) {
@@ -34,5 +42,13 @@ public class UnlinkCommand implements OrphanCommand {
                     accountDatabase.updateAccountLinks(account);
                     actorWrapper.reply(linkType.getLinkMessages().getMessage("unlinked", linkType.newMessageContext(account)));
                 });
+
+        if (account.isSessionActive(config.getSessionDurability())) {
+//            plugin.getAuthenticatingAccountBucket().removeAuthenticatingAccount(account);
+            account.setLastSessionStartTimestamp(0);
+            account.logout(config.getSessionDurability());
+            accountDatabase.saveOrUpdateAccount(account);
+            account.kick("Аккаунт отвязан от телеграмма!");
+        }
     }
 }

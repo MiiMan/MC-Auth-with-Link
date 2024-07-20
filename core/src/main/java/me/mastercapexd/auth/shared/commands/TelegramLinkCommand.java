@@ -1,6 +1,7 @@
 package me.mastercapexd.auth.shared.commands;
 
 import com.bivashy.auth.api.AuthPlugin;
+import com.bivashy.auth.api.account.Account;
 import com.bivashy.auth.api.config.PluginConfig;
 import com.bivashy.auth.api.config.message.Messages;
 import com.bivashy.auth.api.database.AccountDatabase;
@@ -12,7 +13,10 @@ import com.bivashy.auth.api.type.LinkConfirmationType;
 import me.mastercapexd.auth.link.telegram.TelegramLinkType;
 import me.mastercapexd.auth.link.user.confirmation.BaseLinkConfirmationUser;
 import me.mastercapexd.auth.messenger.commands.annotation.CommandKey;
+import me.mastercapexd.auth.server.commands.annotations.AuthenticationStepCommand;
 import me.mastercapexd.auth.server.commands.annotations.TelegramUse;
+import me.mastercapexd.auth.step.impl.LoginAuthenticationStep;
+import me.mastercapexd.auth.step.impl.link.TelegramLinkAuthenticationStep;
 import revxrsal.commands.annotation.DefaultFor;
 import revxrsal.commands.annotation.Dependency;
 import revxrsal.commands.annotation.Optional;
@@ -32,6 +36,7 @@ public class TelegramLinkCommand extends MessengerLinkCommandTemplate implements
         super(messages, TelegramLinkType.getInstance());
     }
 
+//    @AuthenticationStepCommand(stepName = TelegramLinkAuthenticationStep.STEP_NAME)
     @TelegramUse
     @DefaultFor("~")
     public void telegramLink(MessageableCommandActor commandActor, PlayerIdSupplier idSupplier, @Optional LinkUserIdentificator linkUserIdentificator) {
@@ -48,6 +53,10 @@ public class TelegramLinkCommand extends MessengerLinkCommandTemplate implements
             sendLinkConfirmation(commandActor, linkConfirmationType.bindLinkConfirmationUser(
                     new BaseLinkConfirmationUser(linkConfirmationType, timeoutTimestamp, TelegramLinkType.getInstance(), account, code),
                     linkUserIdentificator));
+
+            plugin.getAuthenticatingAccountBucket().removeAuthenticatingAccount(account);
+            account.logout(config.getSessionDurability());
+            account.kick("Регистрация завершена! Перезайдите на сервер после подтвеждения в боте (введите /code " + code + " )");
         });
     }
 }
