@@ -8,6 +8,7 @@ import com.bivashy.auth.api.account.Account;
 import com.bivashy.auth.api.config.PluginConfig;
 import com.bivashy.auth.api.config.message.MessageContext;
 import com.bivashy.auth.api.config.message.Messages;
+import com.bivashy.auth.api.crypto.HashedPassword;
 import com.bivashy.auth.api.link.LinkType;
 import com.bivashy.auth.api.link.user.LinkUser;
 import com.bivashy.auth.api.link.user.confirmation.LinkConfirmationUser;
@@ -15,6 +16,7 @@ import com.bivashy.auth.api.server.command.ServerCommandActor;
 import com.bivashy.auth.api.shared.commands.MessageableCommandActor;
 import com.bivashy.auth.api.type.LinkConfirmationType;
 
+import com.password4j.Password;
 import me.mastercapexd.auth.link.LinkCommandActorWrapper;
 import revxrsal.commands.orphan.OrphanCommand;
 
@@ -35,6 +37,7 @@ public class MessengerLinkCommandTemplate implements OrphanCommand {
             commandActor.replyWithMessage(messages.getMessage("account-not-found"));
             return true;
         }
+
         LinkUser linkUser = account.findFirstLinkUserOrNew(linkFilter, linkType);
         if (!linkUser.isIdentifierDefaultOrNull()) {
             commandActor.replyWithMessage(messages.getMessage("already-linked"));

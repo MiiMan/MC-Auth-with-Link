@@ -13,10 +13,13 @@ import com.bivashy.auth.api.server.message.ServerComponent;
 import com.bivashy.auth.api.server.player.ServerPlayer;
 import com.bivashy.auth.api.step.AuthenticationStepContext;
 import com.bivashy.auth.api.step.MessageableAuthenticationStep;
+import com.bivashy.auth.api.type.LinkConfirmationType;
 import com.bivashy.messenger.common.identificator.Identificator;
 import com.bivashy.messenger.common.keyboard.Keyboard;
 
 import me.mastercapexd.auth.config.message.server.ServerMessageContext;
+import me.mastercapexd.auth.link.telegram.TelegramLinkType;
+import me.mastercapexd.auth.link.user.confirmation.BaseLinkConfirmationUser;
 import me.mastercapexd.auth.link.user.entry.BaseLinkEntryUser;
 import me.mastercapexd.auth.step.AuthenticationStepTemplate;
 
@@ -48,6 +51,7 @@ public class MessengerAuthenticationStep extends AuthenticationStepTemplate impl
 
         if (account.isSessionActive(PLUGIN.getConfig().getSessionDurability()))
             return true;
+
 
         LinkUser linkUser = account.findFirstLinkUser(user -> user.getLinkType().equals(linkType)).orElse(null);
 

@@ -10,6 +10,7 @@ import com.bivashy.auth.api.model.PlayerIdSupplier;
 import com.bivashy.auth.api.shared.commands.MessageableCommandActor;
 import com.bivashy.auth.api.type.LinkConfirmationType;
 
+import com.bivashy.messenger.common.identificator.Identificator;
 import me.mastercapexd.auth.link.telegram.TelegramLinkType;
 import me.mastercapexd.auth.link.user.confirmation.BaseLinkConfirmationUser;
 import me.mastercapexd.auth.messenger.commands.annotation.CommandKey;
@@ -45,6 +46,12 @@ public class TelegramLinkCommand extends MessengerLinkCommandTemplate implements
         accountDatabase.getAccountFromName(accountId).thenAccept(account -> {
             if (isInvalidAccount(account, commandActor, TelegramLinkType.LINK_USER_FILTER))
                 return;
+
+            if (!plugin.getAuthenticatingAccountBucket().getAuthenticatingAccount(idSupplier).get().getCurrentAuthenticationStep().getStepName().equals("TELEGRAM_LINK")) {
+                account.getPlayer().get().sendMessage("Сначала введите пароль!");
+                return;
+            }
+
             String code = generateCode(() -> config.getTelegramSettings().getConfirmationSettings().generateCode());
 
             LinkConfirmationType linkConfirmationType = getLinkConfirmationType(commandActor);
@@ -54,7 +61,10 @@ public class TelegramLinkCommand extends MessengerLinkCommandTemplate implements
                     new BaseLinkConfirmationUser(linkConfirmationType, timeoutTimestamp, TelegramLinkType.getInstance(), account, code),
                     linkUserIdentificator));
 
+            //account.getPlayer().get().sendMessage("Регистрация завершена! Перезайдите на сервер после подтвеждения в боте (введите /code " + code + " )");
+
             plugin.getAuthenticatingAccountBucket().removeAuthenticatingAccount(account);
+
             account.logout(config.getSessionDurability());
             account.kick("Регистрация завершена! Перезайдите на сервер после подтвеждения в боте (введите /code " + code + " )");
         });
