@@ -31,7 +31,7 @@ data:
 #
 #  # Ссылка для скачивания драйвера.
 #  # MySQL 8.0.31:      https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.31/mysql-connector-j-8.0.31.jar
-#  # SQLite 3.36.0.3:   https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.36.0.3/sqlite-jdbc-3.36.0.3.jar
+#  # SQLite 3.45.1.0:   https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.45.1.0/sqlite-jdbc-3.45.1.0.jar
 #  # PostgreSQL 42.4.0: https://repo1.maven.org/maven2/org/postgresql/postgresql/42.5.1/postgresql-42.5.1.jar
 #  # MariaDB 3.0.6:     https://repo1.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/3.0.8/mariadb-java-client-3.0.8.jar
 #  download-url: 'https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.36.0.3/sqlite-jdbc-3.36.0.3.jar'
@@ -176,6 +176,8 @@ hash-type: BCRYPT
 
 # Должны ли писать подтверждать свои пароли при регистрации
 enable-password-confirm: true
+# Должен ли игрок писать пароль в чат вместо команд /login и /register
+enable-password-in-chat: false
 # Минимальная длина пароля
 password-min-length: 5
 # Максимальная длина пароля
@@ -366,7 +368,7 @@ messages:
   auth-reloaded: '&aПлагин успешно перезагрузил конфигурацию'
   config-migrated: '&aКонфигурация успешно мигрирована'
   # Ошибки в командах
-  player-offline: '&cИгрок с ником %account_name% оффлайн!'
+  player-offline: '&cИгрок с ником %player_name% оффлайн!'
   command-cooldown: '&cВы слишком часто используете данную команду! Попробуйте позже.'
   # Название аргумента указывается в виде arg1, arg2, arg3...
   unresolved-argument: '&cВы не указали аргумент: %argument_name%'

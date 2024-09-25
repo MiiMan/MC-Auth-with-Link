@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
+import com.alessiodp.libby.classloader.IsolatedClassLoader;
 import com.bivashy.auth.api.AuthPlugin;
 import com.bivashy.auth.api.AuthPluginProvider;
 import com.bivashy.auth.api.account.AccountFactory;
@@ -74,6 +75,7 @@ import me.mastercapexd.auth.hooks.DiscordHook;
 import me.mastercapexd.auth.hooks.TelegramPluginHook;
 import me.mastercapexd.auth.link.BaseLinkTypeProvider;
 import me.mastercapexd.auth.listener.AuthenticationAttemptListener;
+import me.mastercapexd.auth.listener.AuthenticationChatPasswordListener;
 import me.mastercapexd.auth.management.BaseLibraryManagement;
 import me.mastercapexd.auth.management.BaseLoginManagement;
 import me.mastercapexd.auth.step.impl.EnterAuthServerAuthenticationStep.EnterAuthServerAuthenticationStepFactory;
@@ -154,7 +156,8 @@ public class BaseAuthPlugin implements AuthPlugin {
         this.authenticationStepContextFactoryBucket = new BaseAuthenticationStepContextFactoryBucket(config.getAuthenticationSteps());
         this.accountFactory = new AuthAccountFactory();
         this.linkTypeProvider = BaseLinkTypeProvider.allLinks();
-        this.accountDatabase = new AuthAccountDatabaseProxy(new DatabaseHelper(this));
+        // TODO: Replace this with IsolatedDatabaseHelperFactory
+        this.accountDatabase = new AuthAccountDatabaseProxy(new DatabaseHelper(this, new IsolatedClassLoader()));
         this.loginManagement = new BaseLoginManagement(this);
 
         this.registerAuthenticationSteps();
@@ -162,6 +165,7 @@ public class BaseAuthPlugin implements AuthPlugin {
         this.registerTasks();
 
         this.eventBus.register(new AuthenticationAttemptListener(this));
+        this.eventBus.register(new AuthenticationChatPasswordListener(this));
     }
 
     private void registerAuthenticationSteps() {
@@ -212,6 +216,10 @@ public class BaseAuthPlugin implements AuthPlugin {
 
             eventBus.register(new DiscordLinkRoleModifierListener());
             new DiscordCommandRegistry();
+        }).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            // TODO: Replace with proper logging
+            return null;
         });
     }
 

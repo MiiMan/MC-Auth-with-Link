@@ -40,6 +40,7 @@ public class TelegramLinkCommand extends MessengerLinkCommandTemplate implements
 //    @AuthenticationStepCommand(stepName = TelegramLinkAuthenticationStep.STEP_NAME)
     @TelegramUse
     @DefaultFor("~")
+    @CommandCooldown(CommandCooldown.DEFAULT_VALUE)
     public void telegramLink(MessageableCommandActor commandActor, PlayerIdSupplier idSupplier, @Optional LinkUserIdentificator linkUserIdentificator) {
         String accountId = idSupplier.getPlayerId();
 
