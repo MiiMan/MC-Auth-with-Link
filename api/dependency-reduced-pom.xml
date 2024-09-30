@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>main</artifactId>
+    <groupId>me.mastercapexd.auth</groupId>
+    <version>1.7.12</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.bivashy.auth</groupId>
+  <artifactId>api</artifactId>
+  <repositories>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
+  </repositories>
+  <properties>
+    <multimessenger.version>1.0.5</multimessenger.version>
+    <adventure.serializer.version>4.13.0</adventure.serializer.version>
+    <ormlite.version>6.1</ormlite.version>
+    <event-bus.version>1.2</event-bus.version>
+    <jbcrypt.version>0.4</jbcrypt.version>
+    <adventure.platform.version>4.3.0</adventure.platform.version>
+    <google.authenticator.version>1.5.0</google.authenticator.version>
+    <libby.version>2.0.0</libby.version>
+    <configuration-library.version>4.0.2</configuration-library.version>
+  </properties>
+</project>

@@ -52,6 +52,7 @@ public class AccountEnterDeclineCommand implements OrphanCommand {
             if (result.getEvent().isCancelled())
                 return;
             plugin.getLinkEntryBucket().modifiable().remove(entryUser);
+            plugin.getAuthenticatingAccountBucket().removeAuthenticatingAccount(entryUser.getAccount());
             entryUser.getAccount()
                     .kick(linkType.getServerMessages().getStringMessage("enter-declined", linkType.newMessageContext(entryUser.getAccount())));
             actorWrapper.reply(linkType.getLinkMessages().getMessage("enter-declined", linkType.newMessageContext(entryUser.getAccount())));

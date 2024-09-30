@@ -44,13 +44,19 @@ public class TelegramLinkCommand extends MessengerLinkCommandTemplate implements
         String accountId = idSupplier.getPlayerId();
 
         accountDatabase.getAccountFromName(accountId).thenAccept(account -> {
-            if (isInvalidAccount(account, commandActor, TelegramLinkType.LINK_USER_FILTER))
-                return;
-
-            if (!plugin.getAuthenticatingAccountBucket().getAuthenticatingAccount(idSupplier).get().getCurrentAuthenticationStep().getStepName().equals("TELEGRAM_LINK")) {
-                account.getPlayer().get().sendMessage("Сначала введите пароль!");
+            if (isInvalidAccount(account, commandActor, TelegramLinkType.LINK_USER_FILTER)) {
+                System.out.println("invalid account " + account.getName());
                 return;
             }
+
+            if (account.getPlayer().isPresent() &&
+                    plugin.getAuthenticatingAccountBucket().getAuthenticatingAccount(account.getPlayer().get()).isPresent() &&
+                    !plugin.getAuthenticatingAccountBucket().getAuthenticatingAccount(account.getPlayer().get()).get().getCurrentAuthenticationStep().getStepName().equals("TELEGRAM_LINK")) {
+                System.out.println("invalid step on account");
+                account.getPlayer().get().sendMessage("Команда недоступна на этом этапе");
+                return;
+            }
+
 
             String code = generateCode(() -> config.getTelegramSettings().getConfirmationSettings().generateCode());
 

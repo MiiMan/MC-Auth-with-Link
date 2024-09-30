@@ -1,5 +1,6 @@
 package me.mastercapexd.auth.step.impl.link;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 import com.bivashy.auth.api.AuthPlugin;
@@ -93,10 +94,24 @@ public class MessengerAuthenticationStep extends AuthenticationStepTemplate impl
     @Override
     public void process(ServerPlayer player) {
         Messages<ServerComponent> messages = linkEntryUser.getLinkType().getServerMessages();
-        player.sendMessage(messages.getMessage("enter-confirm-need-chat", new ServerMessageContext(linkEntryUser.getAccount())));
+
+        if (
+                PLUGIN.getAuthenticatingAccountBucket().getAuthenticatingAccount(player).isPresent() &&
+                PLUGIN.getAuthenticatingAccountBucket().getAuthenticatingAccount(player).get().findFirstLinkUser(TelegramLinkType.LINK_USER_FILTER).isPresent()) {
+            player.sendMessage(messages.getMessage("enter-confirm-need-chat", new ServerMessageContext(linkEntryUser.getAccount())));
+            PLUGIN.getCore()
+                    .createTitle(messages.getMessage("enter-confirm-need-title"))
+                    .subtitle(messages.getMessage("enter-confirm-need-subtitle"))
+                    .stay(120)
+                    .send(player);
+
+            return;
+        }
+
+        player.sendMessage(messages.fromText("Привяжите аккаунт командой /addtg для того что бы войти в игру"));
         PLUGIN.getCore()
                 .createTitle(messages.getMessage("enter-confirm-need-title"))
-                .subtitle(messages.getMessage("enter-confirm-need-subtitle"))
+                .subtitle(messages.fromText("Привяжите аккаунт командой /addtg для того что бы войти в игру"))
                 .stay(120)
                 .send(player);
     }

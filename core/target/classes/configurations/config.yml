@@ -1,0 +1,374 @@
+# Автоматическая миграция конфигурации. Плагин мигрриует все конфигурации при включении.
+# При миграции плагин создает бекап.
+auto-migrate-config: false
+# Как должен хранить данные плагин
+# Возможные варианты: MYSQL, SQLITE, POSTGRESQL, MARIADB
+storage-type: SQLITE
+
+# Данный блок отвечает за настройки для удаленного хранилища (База данных).
+# Вы должны настроить данные поля если используете следующие базы: MYSQL, POSTGRESQL, MARIADB
+data:
+  host: localhost
+  database: database
+  username: username
+  password: password
+  port: 3306
+
+#database: # Более расширенная настройка подключения базы данных, но вы по прежнему можете использовать старую версию конфигурации плагина
+#  # Ваш url для подключения базы данных.
+#  # MySQL:     jdbc:mysql://ВАШ_ХОСТ:ПОРТ/БАЗА_ДАННЫХ.      jdbc:mysql://localhost:3306/database
+#  # SQLite:    jdbc:sqlite:ПУТЬ_ДО_ФАЙЛА.                   jdbc:sqlite:%plugin_folder%/database.db.
+#  # PostgreSQL jdbc:postgresql://ВАШ_ХОСТ:ПОРТ/БАЗА_ДАННЫХ. jdbc:postgresql://localhost:3306/database
+#  # MariaDB    jdbc:mariadb://ВАШ_ХОСТ:ПОРТ/БАЗА_ДАННЫХ.    jdbc:mariadb://localhost:3306/database
+#  url: 'jdbc:sqlite:code_auth.db'
+#  #url:
+#  #  type: mysql/sqlite/postgresql/mariadb
+#  #  host: ВАШ_ХОСТ
+#  #  port: ПОРТ
+#  #  database: БАЗА_ДАННЫХ
+#  username: 'admin'
+#  password: 'admin'
+#
+#  # Ссылка для скачивания драйвера.
+#  # MySQL 8.0.31:      https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.31/mysql-connector-j-8.0.31.jar
+#  # SQLite 3.36.0.3:   https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.36.0.3/sqlite-jdbc-3.36.0.3.jar
+#  # PostgreSQL 42.4.0: https://repo1.maven.org/maven2/org/postgresql/postgresql/42.5.1/postgresql-42.5.1.jar
+#  # MariaDB 3.0.6:     https://repo1.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/3.0.8/mariadb-java-client-3.0.8.jar
+#  download-url: 'https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.36.0.3/sqlite-jdbc-3.36.0.3.jar'
+#  migration: false #- useful when using "scheme"
+#  scheme:
+#    auth:
+#      table-name: 'mc_auth_accounts'
+#      columns:
+#        playerId: 'player_id'
+#        playerIdType: 'player_id_type'
+#        cryptoProvider: 'hash_type'
+#        lastIp: 'last_ip'
+#        uniqueId: 'unique_id'
+#        playerName: 'player_name'
+#        passwordHash: 'password_hash'
+#        lastQuitTimestamp: 'last_quit'
+#        lastSessionStartTimestamp: 'last_session_start'
+#    link:
+#      table-name: 'auth_links'
+#      columns:
+#        linkType: 'link_type'
+#        linkUserId: 'link_user_id'
+#        linkEnabled: 'link_enabled'
+#        account: 'account_id'
+#  # Если интересно что такое драйвер (Просто для ознакомления, не более):
+#  #     #*
+#  #    %(#&%@    */(&,/                    Да кто этот ваш драйвер?
+#  #   %/#/@@    %##,        ,,,,,,,         /
+#  #   ,%%%@      (/(      ///////(((((
+#  #              #((#   .%###(((#####%%                                       &&%
+#  #              %%%##  %%%#########%%/                                  ,@%%%&%
+#  #               %%%%#(.%%%%######%%%                               %@&%%%%%&%
+#  #                %%%%#((#@&%%%%%##                               &&&&%%%%%&%
+#  #                 %%%##(((%&&                                   @***#%#%%&%
+#  #                 %##(((((##%%@                               ,&&***///%&%
+#  #                 ##((((((((#%%%%%                           &&&&%%%%%%&%
+#  #                ##((((/((((#%@@&&%(/.                      %&&&%%%%%%&#
+#  #               .((///////((#%      &&##(//(((%%%%%%%%%%######%&&&&/%%/
+#  #              (/////////((#%%  .........##############(##############&&&%%##((//
+#  #             ///*//////(........................................................
+#  #            //***...............................................................
+#
+#  # Простыми словами: Драйвер это как официант который передает еду с кухни на стол клиента. То есть берет и говорить базе данных "Добавь такое-то значение" или "Найди значение которое (тут какая то проверка значения)"
+#  # Скучное описание: https://www.iobroker.net/docu/index-130.htm?page_id=4044&lang=ru (Или загуглите (Зачем?))
+#
+#  # Название драйвера которое будет "кешировано" из ссылки.
+#  # !!! Если вы изменили ссылку, советую удалить драйвер   или изменить это значение. !!!
+#  # .jar в конце лучше оставить.
+#  # Драйвер будет кеширован в папке плагина!
+#  #cache-driver-path: 'database-driver.jar'
+
+# Разрешенные команды в этапе авторизации/регистрации в виде REGEX (сайт для проверки: regex101.com)
+allowed-commands:
+  - '^\/l ' # Если команда начинается на /l 
+  - '^\/login'
+  - '^\/reg'
+  - '^\/register'
+  - '^\/googlecode'
+  - '^\/gcode'
+
+# Пути авторизации игрока, тут можно настроить последовательность подтверждения входа, либо добавить собственный способ подтверждения входа
+# REGISTER - Регистрация игрока. Если игрок зарегистрирован то данный шаг пропускается
+# LOGIN - Шаг авторизации 
+# VK_LINK - Подтверждение входа в VK. Если в конфиге вк выключен или у игрока не привязан вк или он отключил привязку, данный шаг пропускается
+# TELEGRAM_LINK - Подтверждение входа в Telegram. Если в конфиге вк выключен или у игрока не привязан вк или он отключил привязку, данный шаг пропускается
+# DISCORD_LINK - Подтверждение входа в Discord. Если в конфиге вк выключен или у игрока не привязан вк или он отключил привязку, данный шаг пропускается
+# GOOGLE_LINK - Ввод кода гугла. Если в конфиге гугл выключен или у игрока нету гугла данный шаг пропускается
+# ENTER_SERVER - Вход в сервер
+# ENTER_AUTH_SERVER - Вход в сервер авторизации. Требуется для лимбо. ВНИМАНИЕ, ЕСЛИ ИГРОКА ПЕРЕКИДЫВАЕТ НА ДРУГОЙ СЕРВЕР, ИСПОЛЬЗУЙТЕ blocked-servers
+authentication-steps:
+  - REGISTER
+  - LOGIN
+  - VK_LINK
+  - TELEGRAM_LINK
+  - DISCORD_LINK
+  - GOOGLE_LINK
+  - ENTER_SERVER
+
+# Это список заблокированных серверов. Если игрок попадет сюда при регистрации/авторизации то его телепортирует в auth-servers
+# Используйте данную функцию если при авторизации/регистрации игрок переходит в другой сервер (Через НПС, через команду и т.д.) 
+# (Регистр имеет значение)
+blocked-servers:
+  - SERVER-1
+  - SERVER-2
+
+
+# Это список серверов в которые плагин будет подключать не авторизованных игроков.
+auth-servers:
+  - AUTH-1
+
+# Это список серверов в которые плагин будет подключать авторизованных игроков.
+game-servers:
+  - HUB-1
+
+# Это тип наполнения сервера, есть 2 режима: GRADUALLY, RANDOM
+# GRADUALLY - Наполнение по очереди, к примеру: Игроки будут заходить на 1 сервер до тех пор пока он не будет полон
+# RANDOM - Наполнение рандомно, то есть игрок может попасть в 2 сервер даже если 1 сервер свободен 
+fill-type: GRADUALLY
+
+# Вы можете настроить частоту всех сообщений при регистрации, авторизации, подтверждения входа
+# В секундах
+messages-delay: 5
+
+# Боссбар  при регистрации/входе/подтвердения о входе
+boss-bar:
+  use: false
+  # Цвет боссбара
+  # Доступные значения: PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE
+  bar-color: BLUE
+  # Стиль боссбара
+  # Доступные значения: SOLID, SEGMENTED_6,SEGMENTED_10,SEGMENTED_12,SEGMENTED_20
+  # SOLID - делает боссбар полным (без сегментов)
+  # SEGMENTED_ЦИФРА - разделяет боссбар в сегменты
+  bar-style: SOLID
+  # Текст в боссбаре
+  bar-text: '&aВход в сервер [%duration%]'
+  # Подробнее о форматировании: https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html
+  bar-duration-placeholder-format: 'mm:ss'
+
+# Определяет количество онлайн твинков игроков используя IP. Поставьте 0 чтобы отключить лимит
+max-login-per-ip: 0
+
+# Как плагин должен идентифицировать игроков
+# Возможные варианты: UUID, NAME
+id-type: NAME
+
+# Если включено, плагин заблокирует попытку регистрации если у игрока неправильный регистр ника
+# К примеру: Плагин заблокирует соединение игрока если он зарегестрировался как Notch и пытается зайти как: nOtCH, notch, NOTCH и т.д.
+# Вы можете отключить эту опцию если используете id-type: UUID.
+check-name-case: true
+
+# RegEx паттерн разрешенных символом в нике игрока.
+name-regex-pattern: '[a-zA-Z0-9_]*'
+
+# Как плагин должен хешировать пароли игроков
+# Возможные варианты:
+# MD5 - КАТЕГОРИЧЕСКИ НЕ РЕКОМЕНДУЕТСЯ
+# SHA256 - КАТЕГОРИЧЕСКИ НЕ РЕКОМЕНДУЕТСЯ
+# AUTHME_SHA256 - НЕ РЕКОМЕНДУЕТСЯ
+# ARGON2, SCRYPT, BCRYPT - Рекомендуется
+hash-type: BCRYPT
+
+# Должны ли писать подтверждать свои пароли при регистрации
+enable-password-confirm: true
+# Минимальная длина пароля
+password-min-length: 5
+# Максимальная длина пароля
+password-max-length: 20
+# Количество попыток ввода правильного пароля прежде чем игрока кикнет из сервера.
+password-attempts: 3
+# Как долго должна быть активна сессия по ip у игрока.
+session-durability: 4h
+# Сколько секунд у игроков есть прежде чем зарегестрироваться/залогиниться
+# Время можно указывать в виде:
+# y,г    - год           5y 5г
+# mo,мес - месяц         5mo,5мес
+# w,н    - неделя        5w,5н
+# d,д    - день          5d 5д
+# h,ч    - час           5h 5ч
+# m,м    - минута        5m 5м
+# s,с    - секунды       5с 5s
+# ms,мс  - миллисекунды  5ms 5мс
+# Если не указывать, то по умолчанию секунды
+auth-time: 60
+# Должен ли обычный чат быть заблокирован у игроков
+block-chat: true
+
+# Определяет порт на котором работает лимбо. Если у вас не установлен NanoLimboPlugin, эта опция не будет иметь какого либо эффекта.
+# Рекомендуется использовать значение 49152-65535. Подробнее: https://en.wikipedia.org/wiki/Ephemeral_port
+limbo-port: 49152-65535
+
+# Доступные команды в ВК,Telegram!
+# /принять,/accept -> Подтверждение входа через ВК
+# /отклонить,/decline -> Отклонение входа через ВК
+# /отвязать [ник],/unlink [ник] -> для отвязки аккаунта
+# /аккаунты,/accounts -> Контроль аккаунтов через кнопки (Есть система страниц если больше 5 аккаунтов)
+# /контроль [ник],/control [ник],/account-control [ник],/аккаунт-контроль [ник] -> Отправляет клавиатуру для настройки аккаунта 
+# /кик [ник],/kick [ник] -> Кикнуть игрока с сервера
+# /восстановить [ник],/restore [ник] -> Кикает игрока с сервера если он онлайн, сбрасывает пароль на рандомный, и сбрасывает сессию
+# /пароль [ник] [новый пароль],/password [ник] [новый пароль] -> Меняет пароль аккаунта
+# /гугл [ник],/google [ник] -> Генерирует гугл-код и QR-Код
+# /гуглкод [ник] [код],/googlecode [ник] [код] -> Используется при входе с гугл-аутентификацией
+# /гуглотвязать [ник],/googleunlink [ник] -> Отвязывает гугл-аутентификацию
+# /код [код],/code [код] -> Для привязки майнкрафт аккаунта к ВК
+# /админ-панель,/админпанель,/админ,/панель,/admin-panel,/adminpanel,/admin,/panel -> Можно контролировать привязанные, не привязанные аккаунты
+# =============================================
+# Доступные плейсхолдеры:
+# %correct% - Правильный регистр ника
+# %name%,%nick% = ник игрока
+# %account_ip% = ip адрес игрока
+# %vk_id% = vk id игрока, если у игрока нету привязанного vk, то покажет -1
+# %telegram_id% - Айди телеграма в телеграм сообщениях          
+# %vk_screen_name% - Короткая ссылку юзера
+# %vk_first_name% - Имя юзера
+# %vk_last_name% - Фамилия юзера
+google-authenticator:
+  # Включена ли привязка к Google Authenticator, если вы отключите привязку игроки не смогут подтверждать вход, привязывать аккаунты.
+  enabled: false
+messages:
+  # PLAIN            - Обычный текст без цветовых кодов
+  # GSON             - Текст в новом формате JSON
+  # GSON_LEGACY      - Текст в старом формате JSON
+  # LEGACY_AMPERSAND - Формат по умолчанию со знаком &
+  # LEGACY_SECTION   - Формат по умолчанию со знаком §
+  # MINIMESSAGE      - Формат MiniMessage (https://docs.adventure.kyori.net/minimessage/format.html)
+  deserializer: LEGACY_AMPERSAND
+  # Регистрация
+  register-chat: '&fПожалуйста зарегистрируйтесь командой &e/register <пароль>'
+  register-title: '&eРегистрация'
+  register-subtitle: '&fПожалуйста введите &e/register <пароль>'
+  # Логин
+  login-chat: '&fПожалуйста войдите используя команду &e/login <password>'
+  login-title: '&eАвторизация'
+  login-subtitle: '&fПожалуйста введите &e/login <пароль>'
+  # Ошибки
+  time-left: '&cВремя вышло! Пожалуйста, попробуйте снова.'
+  limit-ip-reached: '&cВы находитесь онлайн с большим количеством аккаунтов!'
+  illegal-name-chars: '&cВ вашем никнейме содержатся недопустимые символы!'
+  attempts-limit: '&cВы достигли лимита ввода паролей!'
+  disabled-command: '&cЭта команда отключена до тех пор пока вы не авторизуетесь!'
+  disabled-chat: '&cНельзя писать в чате до тех пор пока вы не авторизуетесь!'
+  disabled-server: '&cНельзя перейти на данный сервер до тех пор пока вы не авторизуетесь!'
+  players-only: '&cКоманда только для игроков!'
+  already-logged-in: '&cВы уже авторизованы.'
+  already-logged-out: '&cВы не авторизованы.'
+  account-exists: '&cТакой аккаунт уже существует. Пожалуйста, войдите.'
+  account-not-found: '&cАккаунт не найден! Пожалуйста, зарегистрируйтесь.'
+  # Авторизация
+  force-connect-success: 'Игрок успешно подключен на сервер!'
+  enter-password: '&cПожалуйста введите ваш пароль.'
+  enter-new-password: '&cПожалуйста введите ваш старый пароль и новый пароль.'
+  wrong-old-password: '&cНеверный пароль!'
+  nothing-to-change: '&cВаши пароли совпдают.'
+  change-success: '&aВаш пароль был изменён.'
+  confirm-password: '&cПожалуйста подтвердите ваш пароль.'
+  confirm-failed: '&cПароли разные!'
+  password-too-short: '&cВаш пароль слишком короткий!'
+  password-too-long: '&cВаш пароль слишком длинный!'
+  wrong-password: '&cНеверный пароль. У вас осталось ещё %attempts% попыток.'
+  register-success: '&aРегистрация прошла успешно.'
+  login-success: '&aВы успешно авторизовались.'
+  logout-success: '&aВы вышли из аккаунта'
+  # ВК
+  vk:
+    # Подтверждение входа через ВК
+    enter-confirm-need-chat: '&fПодтвердите вход в &9ВК &fдля того чтобы войти в игру'
+    enter-confirm-need-title: '&fПодтверждение &9ВК'
+    enter-confirm-need-subtitle: '&fПожалуйста подтвердите в &9ВК'
+    
+    disabled: '&cПривязка к ВК отключена'
+    usage: '&a/addvk'
+    link-limit-reached: 'Слишком много привязанных аккаунтов на данный ВК'
+    already-linked: '&cВы уже привязали аккаунт ВК'
+    confirmation-sent: '[MINIMESSAGE]<green>Всё почти готово. Напиши в личные сообщения в группу <bold>https://vk.com/examplegroup</bold>: <yellow>/code <click:copy_to_clipboard:%code%><hover:show_text:"<red>Нажми, чтобы скопировать код">%code%</hover></click><green> После ввода бот Вконтакте ответит вам что всё прошло успешно'
+    confirmation-success: '&aАккаунт успешно привязан'
+    kicked: '&cВы были кикнуты из сервера по запросу ВК'
+    enter-confirmed: '&aВы подтвердили аккаунт в вк'
+    enter-declined: '&cВы отклонили вход с аккаунта ВК'
+    not-linked: '&bВы не привязали свой аккаунт к ВК. Для дополнительной защиты советуем привязать свой аккаунт через команду /addvk' # Чтобы отключить данное сообщение просто удалите эту линию
+  telegram:
+    # Подтверждение входа через Телеграм
+    enter-confirm-need-chat: '&fПодтвердите вход в &bTelegram &fдля того чтобы войти в игру'
+    enter-confirm-need-title: '&fПодтверждение &bTelegram'
+    enter-confirm-need-subtitle: '&fПожалуйста подтвердите в &bTelegram'
+    
+    disabled: '&cПривязка к Telegram отключена'
+    usage: '&a/addtg'
+    link-limit-reached: 'Слишком много привязанных аккаунтов на данный Telegram'
+    already-linked: '&cВы уже привязали аккаунт Telegram'
+    confirmation-sent: '[MINIMESSAGE]<green>Всё почти готово. Напиши в личные сообщения в телеграм <yellow>@examplebot <bold>https://vk.com/examplegroup</bold>: <yellow>/code <click:copy_to_clipboard:%code%><hover:show_text:"<red>Нажми, чтобы скопировать код">%code%</hover></click><green> После ввода бот Телеграм ответит вам что всё прошло успешно'
+    confirmation-success: '&aАккаунт успешно привязан'
+    kicked: '&cВы были кикнуты из сервера по запросу Telegram'
+    enter-confirmed: '&aВы подтвердили аккаунт в Telegram'
+    enter-declined: '&cВы отклонили вход с аккаунта Telegram'
+    not-linked: '&bВы не привязали свой аккаунт к Telegram. Для дополнительной защиты советуем привязать свой аккаунт через команду /addtg' # Чтобы отключить данное сообщение просто удалите эту линию
+  discord:
+    # Подтверждение входа через Дискорд
+    enter-confirm-need-chat: '&fПодтвердите вход в &bDiscord &fдля того чтобы войти в игру'
+    enter-confirm-need-title: '&fПодтверждение &bDiscord'
+    enter-confirm-need-subtitle: '&fПожалуйста подтвердите в &bDiscord'
+
+    disabled: '&cПривязка к Discord отключена'
+    usage: '&a/adddiscord'
+    link-limit-reached: 'Слишком много привязанных аккаунтов на данный Discord'
+    already-linked: '&cВы уже привязали аккаунт Discord'
+    confirmation-sent: '[MINIMESSAGE]<green>Всё почти готово. Напиши в личные сообщения в Дискорд <bold>https://vk.com/examplegroup</bold>: <yellow>/code <click:copy_to_clipboard:%code%><hover:show_text:"<red>Нажми, чтобы скопировать код">%code%</hover></click><green> После ввода Дискорд бот ответит вам что всё прошло успешно'
+    confirmation-success: '&aАккаунт успешно привязан'
+    already-sent: '&cВы уже отправили код в Discord. Пожалуйста проверьте ваши сообщения Discord'
+    kicked: '&cВы были кикнуты из сервера по запросу Discord'
+    enter-confirmed: '&aВы подтвердили аккаунт в Discord'
+    enter-declined: '&cВы отклонили вход с аккаунта Discord'
+    not-linked: '&bВы не привязали свой аккаунт к Discord. Для дополнительной защиты советуем привязать свой аккаунт через команду /adddiscord' # Чтобы отключить данное сообщение просто удалите эту линию
+  vk-send-code-error: '&cПроизошла ошибка при отправке сообщения на данный id, свяжитесь с администрацией'
+  # Гугл-Аутентификация
+  google:
+    # Этап авторизации через гугл
+    need-code-chat: '&aВведите гугл код в ВК, либо в чате: /googlecode [код]'
+    need-code-title: '&aВведите код'
+    need-code-subtitle: '&aGoogle-Authenticator'
+    
+    disabled: '&cПривязка к гугл-аутентификации отключена'
+    generated: '&aВы успешно сгенерировали ключ Google-Authenticator: %google_key%'
+    regenerated: '&cВнимание! Вы заного сгенерировали ключ Google Authenticator: %google_key%'
+    code-not-enough-arguments: '&cНедостаточно аргументов! Использование команды: /googlecode'
+    code-not-exists: '&cВы не привязали Google-Authenticator!'
+    code-not-need-enter: '&cВход через гугл аутентификацию не требуется!'
+    code-wrong-code: '&cНеправильный код'
+    code-entered: '&aВы успешно прошли аутентификацию с Google-Authenticator'
+    unlink-not-exists: '&cВы не привязали Google-Authenticator!'
+    unlinked: '&cВы успешно отвязали Google-Authenticator!'
+  # Привязка с помощью команды /code на сервере
+  link-code:
+    no-code: '&cУ вас нет кода привязки!'
+    timed-out: '&cВремя привязки вышло!'
+    already-linked: '&cУ вас аккаунт уже привязан'
+  # Подключение
+  autoconnect: '&aСессия восстановлена. Присоединяем Вас к серверу...'
+  check-name-case-failed: '&cНеправильное имя. Аккаунт зарегистрирован под ником %correct%.'
+  no-permission: '&cУ вас недостаточно прав для этого.'
+  info-registered: '&fИгроков зарегистрировано: &e%players%'
+  info-auth: '&fИгроков на сервере авторизации: &e%players%'
+  info-version: '&fВерсия: &e%version%'
+  # Шаги авторизации 
+  authentication-step-usage:
+    REGISTER: '&cВы должны зарегистрироваться используя команду /register [ваш-пароль]'
+    LOGIN: '&cВы должны авторизоваться используя команду /login [ваш-пароль]'
+    VK_LINK: '&cПодтвердите вход через ВК нажав на кнопку Принять или написав /принять'
+    GOOGLE_LINK: '&cВведите ваш гугл код через /google code [ваш код]'
+  # Админ команды
+  auth-change-success: '&aУспешно изменен пароль игрока'
+  auth-delete-success: '&aАккаунт успешно &cудалён'
+  auth-reloaded: '&aПлагин успешно перезагрузил конфигурацию'
+  config-migrated: '&aКонфигурация успешно мигрирована'
+  # Ошибки в командах
+  player-offline: '&cИгрок с ником %account_name% оффлайн!'
+  command-cooldown: '&cВы слишком часто используете данную команду! Попробуйте позже.'
+  # Название аргумента указывается в виде arg1, arg2, arg3...
+  unresolved-argument: '&cВы не указали аргумент: %argument_name%'
+  unresolved-number: '&cОжидалось число, но вы указали %input%'
+  command-invocation: '&cПри вводе команды произошла ошибка, сообщите администрации'
