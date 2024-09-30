@@ -40,11 +40,13 @@ public class UnlinkCommand implements OrphanCommand {
                     if (result.getEvent().isCancelled())
                         return;
 
-
-
-                    linkUser.getLinkUserInfo().setIdentificator(linkType.getDefaultIdentificator());
-                    accountDatabase.updateAccountLinks(account);
-                    actorWrapper.reply(linkType.getLinkMessages().getMessage("unlinked", linkType.newMessageContext(account)));
+                    if (account.isSessionActive(config.getSessionDurability())) {
+                        linkUser.getLinkUserInfo().setIdentificator(linkType.getDefaultIdentificator());
+                        accountDatabase.updateAccountLinks(account);
+                        actorWrapper.reply(linkType.getLinkMessages().getMessage("unlinked", linkType.newMessageContext(account)));
+                    } else {
+                        actorWrapper.reply(linkType.getLinkMessages().fromText("Для отвязки аккаунта необходимо находиться в игре"));
+                    }
                 });
 
         if (account.isSessionActive(config.getSessionDurability())) {
